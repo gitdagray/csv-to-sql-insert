@@ -1,6 +1,14 @@
 # Contributing
 Contributions of any kind are welcome!
 
+## General Steps
+1. Identify an Issue or feature to add 
+2. Fork this repository to your GitHub
+3. Clone the repository from your GitHub
+4. Create a new branch with: `git checkout -b newBranchName` 
+5. Complete your work and push your new branch to your GitHub
+6. Come back to this repo and create a Pull Request to merge your branch with the fix/feature
+
 ## Issues
 
 ### Creating an Issue
