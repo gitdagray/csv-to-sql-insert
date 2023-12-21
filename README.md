@@ -1,4 +1,4 @@
-# csv-to-sql
+# csv-to-sql-insert
 Provide table data as a CSV ([comma-separated values](https://en.wikipedia.org/wiki/Comma-separated_values)) file and output a SQL insert statement for a table with the same name as the file.
 
 ## Usage ⚙
