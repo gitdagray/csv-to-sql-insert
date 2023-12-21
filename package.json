@@ -1,11 +1,16 @@
 {
   "name": "csv-to-sql",
-  "version": "1.0.0",
+  "version": "0.1.0",
+  "repository": "https://github.com/gitdagray/csv-to-sql",
   "description": "input a csv file, output a sql insert statement",
   "main": "index.js",
   "scripts": {
-    "test": "node . filename"
+    "start": "node . filename"
   },
-  "author": "",
-  "license": "ISC"
+  "author": {
+    "name": "Dave Gray",
+    "email": "dave@davegray.codes",
+    "url": "https://www.davegray.codes/"
+  },
+  "license": "MIT"
 }
