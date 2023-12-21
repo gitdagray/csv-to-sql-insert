@@ -1,0 +1,11 @@
+{
+  "name": "csv-to-sql",
+  "version": "1.0.0",
+  "description": "input a csv file, output a sql insert statement",
+  "main": "index.js",
+  "scripts": {
+    "test": "node . filename"
+  },
+  "author": "",
+  "license": "ISC"
+}
