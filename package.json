@@ -4,9 +4,6 @@
   "repository": "https://github.com/gitdagray/csv-to-sql",
   "description": "input a csv file, output a sql insert statement",
   "main": "index.js",
-  "scripts": {
-    "start": "node . filename"
-  },
   "author": {
     "name": "Dave Gray",
     "email": "dave@davegray.codes",
