@@ -1,5 +1,5 @@
 import { promises as fs ,existsSync} from "fs";
-import {createIfNot} from "./utils/fileUtils"
+import {createIfNot} from "./utils/fileUtils.js"
 import * as  path from "node:path"
 async function writeSQL(statement: string, saveFileAs = "") {
   try {
@@ -7,7 +7,7 @@ async function writeSQL(statement: string, saveFileAs = "") {
     if (!destinationFile) {
       throw new Error("Missing saveFileAs parameter");
     }
-    createIfNot(path.resolve(`/sql/${destinationFile}.sql`))
+    createIfNot(path.resolve(`./sql/${destinationFile}.sql`))
     await fs.writeFile(`sql/${process.argv[2]}.sql`, statement);
   } catch (err) {
     console.log(err);
@@ -19,7 +19,7 @@ async function readCSV(csvFileName = "") {
     if (!fileAndTableName) {
       throw new Error("Missing csvFileName parameter");
     }
-    if(existsSync(path.resolve(`./csv/${fileAndTableName}.csv`))){
+    if(!existsSync(path.resolve(`./csv/${fileAndTableName}.csv`))){
       console.log("file not found")
       return
     }
