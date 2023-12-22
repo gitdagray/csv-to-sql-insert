@@ -9,6 +9,15 @@ Provide table data as a CSV ([comma-separated values](https://en.wikipedia.org/w
 5. Watch the terminal window for any error messages
 6. Your SQL insert statement will be saved in `sql/YourFileName.sql`
 
+### How TO
+```node
+  run 'node index.js <csv filename>
+  
+  // To print out an output of your table
+  flag = -r OR --read
+  run 'node index.js <csv filename> flag
+```
+
 ## Support 👨‍💻
 - [Create an Issue](https://github.com/gitdagray/csv-to-sql/issues)
 - [X: @yesdavidgray](https://x.com/yesdavidgray)

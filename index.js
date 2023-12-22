@@ -28,28 +28,7 @@ async function readCSV(csvFileName = '') {
     const linesArray = data.split(/\r|\n/).filter(line => line)
     const columnNames = linesArray.shift().split(",")
 
-    // create the table first and define the parameters
-    let createTable = `CREATE TABLE IF NOT EXISTS ${fileAndTableName} (\n`
-    //define column names
-    const columnsToLower = columnNames.map(name => name.toLowerCase())
-    
-    //column names with date in it
-    const namesWithDate = nameHasDate(columnsToLower)
-    // columns with int values
-    // const firstlineWithVlues = linesArray.shift().split(",")
-    const firstLine = linesArray[1].split(',').slice(1)
-    const namesWithIntegers = isNumber(firstLine, columnNames.slice(1))
-    // remaining columns
-    const otherAttributes = getOtherAttributes(columnsToLower, ['id', ...namesWithIntegers])
-    // add Id attribute
-    if (columnsToLower.includes('id')) createTable += `\tid\tINT PRIMARY KEY NOT NULL`
-    // add integers attribute
-    if (namesWithIntegers.length) namesWithIntegers.map(name => createTable += `,\n\t${name}\tINT`)
-    // add other attributes
-    if (otherAttributes.length) otherAttributes.map(name => createTable += `,\n\t${name}\tVARCHAR(255)`)
-    // add attributes with date
-    if (namesWithDate.length) namesWithDate.map(name => createTable += `,\n\t${name}\tDATE`)
-    createTable += "\n);\n"
+    let createTable = createSQLTable({columnNames, linesArray, fileAndTableName})
 
     let beginSQLInsert = `INSERT INTO ${fileAndTableName} (`
     columnNames.forEach(name => beginSQLInsert += `${name}, `)
@@ -93,7 +72,13 @@ async function readCSV(csvFileName = '') {
     const sqlStatement = createTable + beginSQLInsert + values
 
     // Write File 
-    writeSQL(sqlStatement)
+    await writeSQL(sqlStatement)
+
+    // optionally prints out table format
+    const readTableFlag = process.argv[3] ?? null;
+    if (readTableFlag && (readTableFlag === '-r' || readTableFlag === '--read')) {
+      previewTable({filename: fileAndTableName})
+    }
 
   } catch (err) {
     console.log(err);
@@ -102,10 +87,33 @@ async function readCSV(csvFileName = '') {
 
 readCSV()
 
+console.log('Finished!')
+
+const createSQLTable = ({columnNames, linesArray, fileAndTableName}) => {
+  if(!columnNames.length || !fileAndTableName) throw new Error('No Column Names OR No File name:\nError creating table')
+  let createTable = `CREATE TABLE IF NOT EXISTS ${fileAndTableName} (\n`
+  //define column names
+  const columnsToLower = columnNames.map(name => name.toLowerCase())
+  
+  //column names with date in it
+  const namesWithDate = nameHasDate(columnsToLower)
+  // columns with int values
+  const firstLine = linesArray[1].split(',').slice(1)
+  const namesWithIntegers = isNumber(firstLine, columnNames.slice(1))
+  const otherAttributes = getOtherAttributes(columnsToLower, ['id', ...namesWithIntegers])
+
+  if (columnsToLower.includes('id')) createTable += `\tid\tINT PRIMARY KEY NOT NULL`
+  if (namesWithIntegers.length) namesWithIntegers.map(name => createTable += `,\n\t${name}\tINT`)
+  if (otherAttributes.length) otherAttributes.map(name => createTable += `,\n\t${name}\tVARCHAR(255)`)
+  if (namesWithDate.length) namesWithDate.map(name => createTable += `,\n\t${name}\tDATE`)
+
+  createTable += "\n);\n"
+  return createTable
+}
+
 const nameHasDate = (names=[]) => {
   return names.filter(name => (name.toLowerCase()).includes('date'));
 }
-
 const isNumber = (values=[], names=[]) => {
   const numberValuesIndex = values.map((name, index) => !isNaN(name) ? index : null).filter(val => val !== null);
   return names.filter((name, index) => numberValuesIndex.includes(index) ? name : null).filter(val => val !== null);
@@ -114,4 +122,8 @@ const getOtherAttributes = (allNames=[], alreadyInsertedNames=[]) => {
   const namesInsertedToLower = alreadyInsertedNames.map(name => name.toLowerCase())
   return allNames.filter(name => !namesInsertedToLower.includes(name)).filter(name => !name.includes('date'))
 }
-console.log('Finished!')
+
+const previewTable = async({filename}) => {
+  const fsRead = await fs.readFile(`sql/${filename}.sql`, { encoding: 'utf8' })
+  console.info(fsRead)
+}
