@@ -5,7 +5,7 @@ Provide table data as a CSV ([comma-separated values](https://en.wikipedia.org/w
 1. Confirm you have a directory named `csv`
 2. Confirm you have a directory named `sql`
 3. Save your input CSV file in the `csv` directory
-4. In a terminal window, run `node . YourFileName`
+4. In a terminal window, first run `npm install` to install dependencies and then run `npm start YourFileName`
 5. Watch the terminal window for any error messages
 6. Your SQL insert statement will be saved in `sql/YourFileName.sql`
 
