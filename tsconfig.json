@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "ES2020",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "noEmitOnError": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
+}
