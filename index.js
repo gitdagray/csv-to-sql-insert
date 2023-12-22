@@ -1,6 +1,9 @@
 import fs from "node:fs/promises";
+import { createInterface } from 'node:readline';
 
-async function writeSQL(statement, saveFileAs = "") {
+
+
+async function writeSQL (statement, saveFileAs = "") {
 	try {
 		const destinationFile = process.argv[2] || saveFileAs;
 
@@ -14,7 +17,80 @@ async function writeSQL(statement, saveFileAs = "") {
 	}
 }
 
-async function readCSV(csvFileName = "") {
+function previewSQL (fileData) {
+	const rl = createInterface({
+		input: process.stdin,
+		output: process.stdout
+	});
+
+
+	rl.question(`Here's a preview of your SQL code:\n\n${fileData}\n\nDo you want to save it? (Yes/No) `, (reply) => {
+
+		// Valid options
+		const options = ["y", "yes", "n", "no"];
+
+		let cleanReply = reply.trim().toLowerCase();
+
+		if (options.includes(cleanReply)) {
+			// Save or exit
+			if (cleanReply[0] == 'y') {
+				// Save
+				writeSQL(fileData);
+				console.log("SQL code successfully saved!");
+			} else {
+				console.log("SQL code not saved. Operation cancelled.");
+			}
+
+			// Close readline interface
+			rl.close();
+		} else {
+
+
+			// User gave an invalid response, provide a chance to correct
+			rl.setPrompt(`${reply.trim()} is an invalid response, do you want to save the file? (Yes | Y OR No | N) `);
+
+			rl.prompt();
+
+			// Set a limit on attempts
+			let maxAttempts = 5;
+
+
+			// Get user input every time they hit enter!
+			rl.on("line", (userInput) => {
+
+				if (maxAttempts > 0) {
+					let cleanReply = userInput.trim().toLowerCase();
+
+					if (options.includes(cleanReply)) {
+						// Save or exit
+						if (cleanReply[0] == 'y') {
+							// Save
+							writeSQL(fileData);
+							console.log("SQL code successfully saved!");
+						} else {
+							console.log("SQL code not saved. Operation cancelled.");
+						}
+						// Close readline interface
+						rl.close();
+
+					} else {
+						rl.setPrompt(`${userInput.trim()} is an invalid response, do you want to save the file? (Yes | Y OR No | N) `);
+						rl.prompt();
+					}
+				} else {
+					// Max attempts reached
+					console.log("Maximum attempts exceeded. Operation cancelled.");
+					rl.close();
+				}
+				// Decrement attempts
+				maxAttempts--;
+
+			});
+		}
+	});
+}
+
+async function readCSV (csvFileName = "") {
 	try {
 		const fileAndTableName = process.argv[2] || csvFileName;
 
@@ -67,8 +143,8 @@ async function readCSV(csvFileName = "") {
 
 		const sqlStatement = beginSQLInsert + values;
 
-		// Write File
-		writeSQL(sqlStatement);
+		// Preview and save
+		previewSQL(sqlStatement);
 	} catch (err) {
 		console.log(err);
 	}
@@ -76,4 +152,3 @@ async function readCSV(csvFileName = "") {
 
 readCSV();
 
-console.log("Finished!");
