@@ -1,4 +1,5 @@
 const fs = require("node:fs/promises");
+const yargs = require("yargs");
 
 async function ensureDirectoryExists(directoryPath) {
   try {
@@ -39,7 +40,7 @@ async function readCSV(csvFileName = "") {
     }
 
     // Ensure that the "csv" directory exists
-    await ensureDirectoryExists("sql");
+    await ensureDirectoryExists("csv");
 
     const data = await fs.readFile(`csv/${fileAndTableName}.csv`, {
       encoding: "utf8",
