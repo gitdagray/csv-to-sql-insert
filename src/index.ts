@@ -1,12 +1,27 @@
 import { promises as fs } from "fs";
 
+async function ensureDirectoryExists(directory: string): Promise<void> {
+  try {
+    await fs.access(directory);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      await fs.mkdir(directory, { recursive: true });
+    } else {
+      throw error;
+    }
+  }
+}
+
 async function writeSQL(statement: string, saveFileAs = "") {
   try {
     const destinationFile = process.argv[2] || saveFileAs;
+    const sqlDirectory = 'sql';
 
     if (!destinationFile) {
       throw new Error("Missing saveFileAs parameter");
     }
+
+    await ensureDirectoryExists(sqlDirectory);
 
     await fs.writeFile(`sql/${process.argv[2]}.sql`, statement);
   } catch (err) {
@@ -17,10 +32,13 @@ async function writeSQL(statement: string, saveFileAs = "") {
 async function readCSV(csvFileName = "") {
   try {
     const fileAndTableName = process.argv[2] || csvFileName;
+    const csvDirectory = 'csv';
 
     if (!fileAndTableName) {
       throw new Error("Missing csvFileName parameter");
     }
+
+    await ensureDirectoryExists(csvDirectory);
 
     const data = await fs.readFile(`csv/${fileAndTableName}.csv`, {
       encoding: "utf8",

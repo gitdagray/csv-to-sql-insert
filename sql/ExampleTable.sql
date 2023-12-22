@@ -1,4 +1,4 @@
-INSERT INTO ExampleTable (id, description, entryDate, location, rate, isActive)
+INSERT INTO ./ExampleTable (id, description, entryDate, location, rate, isActive)
 VALUES
 	(1, "American Farms", "2023-11-17 00:00:00.000", "New York", 0.05, 1),
 	(2, "Beatles", "2023-11-01 00:00:00.000", NULL, 0.01, 0),
