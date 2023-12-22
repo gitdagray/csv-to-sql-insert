@@ -1,0 +1,6 @@
+{
+    
+    "extends": ["standard-with-typescript", "airbnb", "prettier"],
+    "plugins": ["prettier"],
+    "rules": {}
+}
