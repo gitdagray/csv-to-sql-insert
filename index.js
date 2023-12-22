@@ -1,12 +1,28 @@
-const fs = require('node:fs/promises');
+const fs = require("node:fs/promises");
 
-async function writeSQL(statement, saveFileAs = '') {
+async function ensureDirectoryExists(directoryPath) {
   try {
-    const destinationFile = process.argv[2] || saveFileAs
+    await fs.access(directoryPath, fs.constants.F_OK);
+  } catch (error) {
+    if (err.code === "ENOENT") {
+      // Directory doesn't exist, create it
+      await fs.mkdir(directoryPath, { recursive: true });
+    } else {
+      throw err;
+    }
+  }
+}
+
+async function writeSQL(statement, saveFileAs = "") {
+  try {
+    const destinationFile = process.argv[2] || saveFileAs;
 
     if (!destinationFile) {
-      throw new Error("Missing saveFileAs parameter")
+      throw new Error("Missing saveFileAs parameter");
     }
+
+    // Ensure that the "sql" directory exists
+    await ensureDirectoryExists("sql");
 
     await fs.writeFile(`sql/${process.argv[2]}.sql`, statement);
   } catch (err) {
@@ -14,69 +30,72 @@ async function writeSQL(statement, saveFileAs = '') {
   }
 }
 
-async function readCSV(csvFileName = '') {
+async function readCSV(csvFileName = "") {
   try {
-
-    const fileAndTableName = process.argv[2] || csvFileName
+    const fileAndTableName = process.argv[2] || csvFileName;
 
     if (!fileAndTableName) {
-      throw new Error("Missing csvFileName parameter")
+      throw new Error("Missing csvFileName parameter");
     }
 
-    const data = await fs.readFile(`csv/${fileAndTableName}.csv`, { encoding: 'utf8' });
+    // Ensure that the "csv" directory exists
+    await ensureDirectoryExists("sql");
 
-    const linesArray = data.split(/\r|\n/).filter(line => line)
-    const columnNames = linesArray.shift().split(",")
+    const data = await fs.readFile(`csv/${fileAndTableName}.csv`, {
+      encoding: "utf8",
+    });
 
-    let beginSQLInsert = `INSERT INTO ${fileAndTableName} (`
-    columnNames.forEach(name => beginSQLInsert += `${name}, `)
-    beginSQLInsert = beginSQLInsert.slice(0, -2) + ")\nVALUES\n"
+    const linesArray = data.split(/\r|\n/).filter((line) => line);
+    const columnNames = linesArray.shift().split(",");
 
-    let values = ''
-    linesArray.forEach(line => {
+    let beginSQLInsert = `INSERT INTO ${fileAndTableName} (`;
+    columnNames.forEach((name) => (beginSQLInsert += `${name}, `));
+    beginSQLInsert = beginSQLInsert.slice(0, -2) + ")\nVALUES\n";
+
+    let values = "";
+    linesArray.forEach((line) => {
       // Parses each line of CSV into field values array
-      const arr = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
+      const arr = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
 
       if (arr.length > columnNames.length) {
-        console.log(arr)
-        throw new Error("Too Many Values in row")
+        console.log(arr);
+        throw new Error("Too Many Values in row");
       } else if (arr.length < columnNames.length) {
-        console.log(arr)
-        throw new Error("Too Few Values in row")
+        console.log(arr);
+        throw new Error("Too Few Values in row");
       }
 
-      let valueLine = '\t('
-      arr.forEach(value => {
-        // Matches NULL values, Numbers, 
+      let valueLine = "\t(";
+      arr.forEach((value) => {
+        // Matches NULL values, Numbers,
         // Strings accepted as numbers, and Booleans (0 or 1)
         if (value === "NULL" || !isNaN(+value)) {
-          valueLine += `${value}, `
-        }
-        else {
+          valueLine += `${value}, `;
+        } else {
           // If a string is wrapped in quotes, it doesn't need more
-          if (value.at(0) === '"') valueLine += `${value}, `
+          if (value.at(0) === '"') valueLine += `${value}, `;
           else {
             // This wraps strings in quotes
             // also wraps timestamps
-            valueLine += `"${value}", `
+            valueLine += `"${value}", `;
           }
         }
-      })
-      valueLine = valueLine.slice(0, -2) + "),\n"
-      values += valueLine
-    })
-    values = values.slice(0, -2) + ";"
+      });
+      valueLine = valueLine.slice(0, -2) + "),\n";
+      values += valueLine;
+    });
+    values = values.slice(0, -2) + ";";
 
-    const sqlStatement = beginSQLInsert + values
+    const sqlStatement = beginSQLInsert + values;
 
-    // Write File 
-    writeSQL(sqlStatement)
-
+    // Write File
+    // Added await to ensure it completes before proceeding
+    await writeSQL(sqlStatement);
   } catch (err) {
     console.log(err);
   }
 }
 
-readCSV()
+readCSV();
 
-console.log('Finished!')
+console.log("Finished!");
