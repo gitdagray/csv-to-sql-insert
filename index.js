@@ -39,7 +39,7 @@ async function readCSV(csvFileName = "") {
     }
 
     // Ensure that the "csv" directory exists
-    await ensureDirectoryExists("sql");
+    await ensureDirectoryExists("csv");
 
     const data = await fs.readFile(`csv/${fileAndTableName}.csv`, {
       encoding: "utf8",
