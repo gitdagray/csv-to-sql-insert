@@ -1,6 +1,6 @@
 import { promises as fs } from "fs";
 
-async function writeSQL(statement: string, saveFileAs = "") {
+async function writeSQL(statement: string, saveFileAs = "", isAppend: boolean = false) {
   try {
     const destinationFile = process.argv[2] || saveFileAs;
 
@@ -8,15 +8,23 @@ async function writeSQL(statement: string, saveFileAs = "") {
       throw new Error("Missing saveFileAs parameter");
     }
 
-    await fs.writeFile(`sql/${process.argv[2]}.sql`, statement);
+		if(isAppend){
+      await fs.appendFile(`sql/${process.argv[2]}.sql`, statement);
+    }else{
+      await fs.writeFile(`sql/${process.argv[2]}.sql`, statement);
+    }
+
   } catch (err) {
     console.log(err);
   }
 }
 
-async function readCSV(csvFileName = "") {
+async function readCSV(csvFileName = "", batchSize: number = 0) {
   try {
     const fileAndTableName = process.argv[2] || csvFileName;
+    
+    batchSize = parseInt(process.argv[3]) || batchSize || 500;
+		let isAppend: boolean = false;
 
     if (!fileAndTableName) {
       throw new Error("Missing csvFileName parameter");
@@ -34,7 +42,7 @@ async function readCSV(csvFileName = "") {
     beginSQLInsert = beginSQLInsert.slice(0, -2) + ")\nVALUES\n";
 
     let values = "";
-    linesArray.forEach((line) => {
+    linesArray.forEach((line, index) => {
       // Parses each line of CSV into field values array
       const arr = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
 
@@ -46,6 +54,18 @@ async function readCSV(csvFileName = "") {
         throw new Error("Too Few Values in row");
       }
 
+      // Check batch size (rows per batch)
+      if(index > 0 && index % batchSize == 0){
+        values = values.slice(0, -2) + ";\n\n";
+    
+        const sqlStatement = beginSQLInsert + values;
+    
+        // Write File 
+        writeSQL(sqlStatement, fileAndTableName, isAppend);
+        values = "";
+        isAppend = true;
+      }
+      
       let valueLine = "\t(";
       arr.forEach((value) => {
         // Matches NULL values, Numbers,
@@ -70,7 +90,7 @@ async function readCSV(csvFileName = "") {
     const sqlStatement = beginSQLInsert + values;
 
     // Write File
-    writeSQL(sqlStatement);
+    writeSQL(sqlStatement, fileAndTableName, isAppend);
   } catch (err) {
     console.log(err);
   }
