@@ -1,4 +1,4 @@
-const fs = require("node:fs/promises");
+import fs from "node:fs/promises";
 
 async function ensureDirectoryExists(directoryPath) {
   try {
