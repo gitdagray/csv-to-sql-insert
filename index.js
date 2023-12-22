@@ -10,7 +10,7 @@ async function writeSQL(statement, saveFileAs = "") {
 
 		await fs.writeFile(`sql/${process.argv[2]}.sql`, statement);
 	} catch (err) {
-		console.log(err);
+		console.error(err);
 	}
 }
 
@@ -70,7 +70,7 @@ async function readCSV(csvFileName = "") {
 		// Write File
 		writeSQL(sqlStatement);
 	} catch (err) {
-		console.log(err);
+		console.error(err);
 	}
 }
 
