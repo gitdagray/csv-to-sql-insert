@@ -1,46 +1,30 @@
-const fs = require("node:fs/promises");
-const yargs = require("yargs");
-
-// Use yargs to define command line options
-
-const argv = yargs
-  .option("saveFileAs", {
-    alias: "s",
-    describe: "Specify th ename of the file to save the SQL statement",
-    type: "string",
-  })
-  .option("csvFileName", {
-    alias: "c",
-    describe: "Specify th ename of the file to save the SQL statement",
-    type: "string",
-  })
-  .help().argv;
+import fs from "node:fs/promises";
 
 async function ensureDirectoryExists(directoryPath) {
   try {
-    await fs.access(directoryPath, 0);
+    await fs.access(directoryPath, fs.constants.F_OK);
   } catch (error) {
-    if (error.code === "ENOENT") {
+    if (err.code === "ENOENT") {
       // Directory doesn't exist, create it
       await fs.mkdir(directoryPath, { recursive: true });
     } else {
-      throw error;
+      throw err;
     }
   }
 }
 
 async function writeSQL(statement, saveFileAs = "") {
   try {
-    const destinationFile = argv.saveFileAs || saveFileAs;
+    const destinationFile = process.argv[2] || saveFileAs;
 
     if (!destinationFile) {
       throw new Error("Missing saveFileAs parameter");
     }
 
-    // Ensure that the "sql" directory exists
+    // Ensure that the "sql" directory exists.
     await ensureDirectoryExists("sql");
 
-    await fs.writeFile(`sql/${destinationFile}.sql`, statement);
+    await fs.writeFile(`sql/${process.argv[2]}.sql`, statement);
   } catch (err) {
     console.log(err);
   }
@@ -48,7 +32,7 @@ async function writeSQL(statement, saveFileAs = "") {
 
 async function readCSV(csvFileName = "") {
   try {
-    const fileAndTableName = argv.csvFileName || csvFileName;
+    const fileAndTableName = process.argv[2] || csvFileName;
 
     if (!fileAndTableName) {
       throw new Error("Missing csvFileName parameter");
