@@ -1,3 +1,11 @@
+CREATE TABLE IF NOT EXISTS ExampleTable (
+	id	INT PRIMARY KEY NOT NULL,
+	rate	INT,
+	isActive	INT,
+	description	VARCHAR(255),
+	location	VARCHAR(255),
+	entrydate	DATE
+);
 INSERT INTO ExampleTable (id, description, entryDate, location, rate, isActive)
 VALUES
 	(1, "American Farms", "2023-11-17 00:00:00.000", "New York", 0.05, 1),

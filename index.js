@@ -28,6 +28,29 @@ async function readCSV(csvFileName = '') {
     const linesArray = data.split(/\r|\n/).filter(line => line)
     const columnNames = linesArray.shift().split(",")
 
+    // create the table first and define the parameters
+    let createTable = `CREATE TABLE IF NOT EXISTS ${fileAndTableName} (\n`
+    //define column names
+    const columnsToLower = columnNames.map(name => name.toLowerCase())
+    
+    //column names with date in it
+    const namesWithDate = nameHasDate(columnsToLower)
+    // columns with int values
+    // const firstlineWithVlues = linesArray.shift().split(",")
+    const firstLine = linesArray[1].split(',').slice(1)
+    const namesWithIntegers = isNumber(firstLine, columnNames.slice(1))
+    // remaining columns
+    const otherAttributes = getOtherAttributes(columnsToLower, ['id', ...namesWithIntegers])
+    // add Id attribute
+    if (columnsToLower.includes('id')) createTable += `\tid\tINT PRIMARY KEY NOT NULL`
+    // add integers attribute
+    if (namesWithIntegers.length) namesWithIntegers.map(name => createTable += `,\n\t${name}\tINT`)
+    // add other attributes
+    if (otherAttributes.length) otherAttributes.map(name => createTable += `,\n\t${name}\tVARCHAR(255)`)
+    // add attributes with date
+    if (namesWithDate.length) namesWithDate.map(name => createTable += `,\n\t${name}\tDATE`)
+    createTable += "\n);\n"
+
     let beginSQLInsert = `INSERT INTO ${fileAndTableName} (`
     columnNames.forEach(name => beginSQLInsert += `${name}, `)
     beginSQLInsert = beginSQLInsert.slice(0, -2) + ")\nVALUES\n"
@@ -67,7 +90,7 @@ async function readCSV(csvFileName = '') {
     })
     values = values.slice(0, -2) + ";"
 
-    const sqlStatement = beginSQLInsert + values
+    const sqlStatement = createTable + beginSQLInsert + values
 
     // Write File 
     writeSQL(sqlStatement)
@@ -79,4 +102,16 @@ async function readCSV(csvFileName = '') {
 
 readCSV()
 
+const nameHasDate = (names=[]) => {
+  return names.filter(name => (name.toLowerCase()).includes('date'));
+}
+
+const isNumber = (values=[], names=[]) => {
+  const numberValuesIndex = values.map((name, index) => !isNaN(name) ? index : null).filter(val => val !== null);
+  return names.filter((name, index) => numberValuesIndex.includes(index) ? name : null).filter(val => val !== null);
+}
+const getOtherAttributes = (allNames=[], alreadyInsertedNames=[]) => {
+  const namesInsertedToLower = alreadyInsertedNames.map(name => name.toLowerCase())
+  return allNames.filter(name => !namesInsertedToLower.includes(name)).filter(name => !name.includes('date'))
+}
 console.log('Finished!')
