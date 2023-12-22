@@ -21,7 +21,7 @@ async function writeSQL(statement, saveFileAs = "") {
       throw new Error("Missing saveFileAs parameter");
     }
 
-    // Ensure that the "sql" directory exists
+    // Ensure that the "sql" directory exists.
     await ensureDirectoryExists("sql");
 
     await fs.writeFile(`sql/${process.argv[2]}.sql`, statement);
