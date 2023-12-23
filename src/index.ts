@@ -1,6 +1,7 @@
 import { promises as fs ,existsSync} from "fs";
 import {createIfNot} from "./utils/fileUtils.js"
 import * as  path from "node:path"
+
 async function writeSQL(statement: string, saveFileAs = "", isAppend: boolean = false) {
   try {
     const destinationFile = process.argv[2] || saveFileAs;
