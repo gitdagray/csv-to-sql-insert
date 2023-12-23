@@ -2,6 +2,14 @@ import fs from "node:fs/promises"
 import { existsSync } from "node:fs"
 import { createIfNot } from "./utils/fileUtils.mjs"
 import path from "node:path"
+
+/**
+ * Writes SQL statements to a file.
+ * @param statement - SQL statement to be written.
+ * @param saveFileAs - File name to save the SQL statements.
+ * @param isAppend - Flag to indicate whether to append to an existing file.
+ */
+
 async function writeSQL(statement, saveFileAs = "") {
   try {
     const destinationFile = process.argv[2] || saveFileAs
@@ -11,9 +19,15 @@ async function writeSQL(statement, saveFileAs = "") {
     createIfNot(path.resolve(`./sql/${destinationFile}`))
     await fs.writeFile(`sql/${process.argv[2]}.sql`, statement)
   } catch (err) {
-    console.log(err)
+    console.error(`Error in writeSQL: ${err}`);
   }
 }
+/**
+ * Reads a CSV file and generates SQL insert statements.
+ * @param csvFileName - CSV file name.
+ * @param batchSize - Number of rows per batch.
+ */
+
 async function readCSV(csvFileName = "") {
   try {
     const fileAndTableName = process.argv[2] || csvFileName
@@ -21,8 +35,7 @@ async function readCSV(csvFileName = "") {
       throw new Error("Missing csvFileName parameter")
     }
     if (!existsSync(path.resolve(`./csv/${fileAndTableName}.csv`))) {
-      console.log("file not found")
-      return
+      throw new Error(`File not found: ${fileAndTableName}.csv`);
     }
     const data = await fs.readFile(`csv/${fileAndTableName}.csv`, {
       encoding: "utf8",
@@ -67,8 +80,10 @@ async function readCSV(csvFileName = "") {
     // Write File
     writeSQL(sqlStatement)
   } catch (err) {
-    console.log(err)
+    console.error(`Error in readCSV: ${err}`);
   }
 }
-readCSV()
-console.log("Finished!")
+
+// Call the readCSV function
+readCSV().then(() => console.log("Finished!")).catch((err) => console.error(err.message));
+
