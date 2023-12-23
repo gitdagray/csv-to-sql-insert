@@ -1,6 +1,11 @@
 import { promises as fs ,existsSync} from "fs";
 import {createIfNot} from "./utils/fileUtils.js"
+import { hrtime } from "node:process";
 import * as  path from "node:path"
+
+const START_PROCESS: bigint = hrtime.bigint(); // Measure script execution time
+let totalRows: number = 0; // Count of rows processed
+
 async function writeSQL(statement: string, saveFileAs = "", isAppend: boolean = false) {
   try {
     const destinationFile = process.argv[2] || saveFileAs;
@@ -82,6 +87,7 @@ async function readCSV(csvFileName = "", batchSize: number = 0) {
       });
       valueLine = valueLine.slice(0, -2) + "),\n";
       values += valueLine;
+      totalRows++; // add to total rows processed
     });
     values = values.slice(0, -2) + ";";
     const sqlStatement = beginSQLInsert + values;
@@ -91,5 +97,11 @@ async function readCSV(csvFileName = "", batchSize: number = 0) {
     console.log(err);
   }
 }
-readCSV();
-console.log("Finished!");
+
+readCSV().then(() => {
+  const END_PROCESS: bigint = hrtime.bigint(); // End of script execution
+  console.log('\n*** Summary Report ***\n');
+  console.log(`Processed ${totalRows} row${totalRows == 1 ? "" : "s"} in ${(END_PROCESS - START_PROCESS) / BigInt(1000000)} milliseconds.\n`);
+  console.log("'Keep Striving for Progress over Perfection.' ~ Dave Gray\n");
+  console.log("*** End of Summary ***\n");
+});
