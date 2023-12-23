@@ -1,8 +1,9 @@
 import { promises as fs ,existsSync} from "fs";
 import {createIfNot} from "./utils/fileUtils.js"
 import * as  path from "node:path"
-async function writeSQL(statement: string, saveFileAs = "", isAppend: boolean = false) {
-  try {
+import { catchAsync } from "./utils/catchAsync.js";
+
+const writeSQL = catchAsync(async function (statement: string, saveFileAs = "", isAppend: boolean = false) {
     const destinationFile = process.argv[2] || saveFileAs;
     if (!destinationFile) {
       throw new Error("Missing saveFileAs parameter");
@@ -13,13 +14,9 @@ async function writeSQL(statement: string, saveFileAs = "", isAppend: boolean = 
     }else{
       await fs.writeFile(`sql/${process.argv[2]}.sql`, statement);
     }
-  } catch (err) {
-    console.log(err);
-  }
-}
+});
 
-async function readCSV(csvFileName = "", batchSize: number = 0) {
-  try {
+const readCSV = catchAsync(async function (csvFileName = "", batchSize: number = 0) {
     const fileAndTableName = process.argv[2] || csvFileName;
     
     batchSize = parseInt(process.argv[3]) || batchSize || 500;
@@ -87,9 +84,8 @@ async function readCSV(csvFileName = "", batchSize: number = 0) {
     const sqlStatement = beginSQLInsert + values;
     // Write File
     writeSQL(sqlStatement, fileAndTableName, isAppend);
-  } catch (err) {
-    console.log(err);
-  }
-}
+})
+
+
 readCSV();
 console.log("Finished!");
