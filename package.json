@@ -1,41 +1,53 @@
 {
-  "name": "csv-to-sql-insert",
-  "version": "0.1.0",
-  "type": "module",
-  "repository": "https://github.com/gitdagray/csv-to-sql",
-  "description": "input a csv file, output a sql insert statement",
-  "main": "index.js",
-  "scripts": {
-    "start": "npm run build && node dist/index.js",
-    "build": "tsc  --skipLibCheck"
-  },
-  "author": {
-    "name": "Dave Gray",
-    "email": "dave@davegray.codes",
-    "url": "https://www.davegray.codes/"
-  },
-  "license": "MIT",
-  "devDependencies": {
-    "@types/node": "^20.10.5",
-    "@typescript-eslint/eslint-plugin": "^6.15.0",
-    "eslint": "^8.56.0",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-config-node": "^4.1.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-config-standard-with-typescript": "^43.0.0",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-n": "^16.5.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^5.1.1",
-    "eslint-plugin-promise": "^6.1.1",
-    "husky": "^8.0.3",
-    "prettier": "^3.1.1",
-    "pretty-quick": "^3.1.3",
-    "typescript": "^5.3.3"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "pretty-quick --staged"
-    }
-  }
+	"name": "csv-to-sql-insert",
+	"version": "0.1.0",
+	"type": "module",
+	"repository": "https://github.com/gitdagray/csv-to-sql",
+	"description": "input a csv file, output a sql insert statement",
+	"main": "index.js",
+	"scripts": {
+		"start": "npm run build && node dist/index.js",
+		"build": "tsc --skipLibCheck",
+		"lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+		"lint:fix": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0 --fix",
+		"prettify": "prettier --ignore-path .gitignore --write \"**/*.(ts|tsx|js|jsx)\"",
+		"format": "npm run lint:fix && npm run prettify",
+		"prepare": "husky install",
+		"commit": "cz"
+	},
+	"author": {
+		"name": "Dave Gray",
+		"email": "dave@davegray.codes",
+		"url": "https://www.davegray.codes/"
+	},
+	"license": "MIT",
+	"devDependencies": {
+		"@commitlint/cli": "18.4.3",
+		"@commitlint/config-conventional": "18.4.3",
+		"@commitlint/cz-commitlint": "^18.4.3",
+		"@types/node": "^20.10.5",
+		"@typescript-eslint/eslint-plugin": "6.15.0",
+		"@typescript-eslint/parser": "6.15.0",
+		"commitizen": "4.3.0",
+		"cz-conventional-changelog": "3.3.0",
+		"eslint": "8.56.0",
+		"husky": "8.0.3",
+		"lint-staged": "15.2.0",
+		"prettier": "3.1.1",
+		"typescript": "^5.3.3"
+	},
+	"lint-staged": {
+		"*.{js,jsx,ts,tsx}": [
+			"prettier --write",
+			"eslint --fix"
+		],
+		"*.{json,yaml,md}": [
+			"prettier --write"
+		]
+	},
+	"config": {
+		"commitizen": {
+			"path": "node_modules/@commitlint/cz-commitlint"
+		}
+	}
 }

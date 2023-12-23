@@ -1,12 +1,15 @@
 {
-  "compilerOptions": {
-    "target": "es6",
-    "module": "ES2020",
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "strict": true,
-    "noEmitOnError": true
-  },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules"]
+	"compilerOptions": {
+		"target": "es6",
+		"types": ["node"],
+		"esModuleInterop": true,
+		"module": "NodeNext",
+		"outDir": "./dist",
+		"rootDir": "./src",
+		"strict": true,
+		"noEmitOnError": true,
+		"moduleResolution": "NodeNext"
+	},
+	"include": ["src/**/*.ts"],
+	"exclude": ["node_modules"]
 }
