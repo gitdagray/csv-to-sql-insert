@@ -24,7 +24,6 @@
 	"devDependencies": {
 		"@commitlint/cli": "18.4.3",
 		"@commitlint/config-conventional": "18.4.3",
-		"@commitlint/cz-commitlint": "^18.4.3",
 		"@types/node": "^20.10.5",
 		"@typescript-eslint/eslint-plugin": "6.15.0",
 		"@typescript-eslint/parser": "6.15.0",
@@ -45,9 +44,20 @@
 			"prettier --write"
 		]
 	},
+	"commitlint": {
+		"extends": [
+			"@commitlint/config-conventional"
+		],
+		"rules": {
+			"body-leading-blank": [
+				2,
+				"always"
+			]
+		}
+	},
 	"config": {
 		"commitizen": {
-			"path": "node_modules/@commitlint/cz-commitlint"
+			"path": "node_modules/cz-conventional-changelog"
 		}
 	}
 }
