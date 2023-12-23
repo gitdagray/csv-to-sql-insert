@@ -1,6 +1,6 @@
 import * as fs from "node:fs"
-export function createIfNot(dir:string) {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true })
+export function createIfNot(filePath:string) {
+  if (!fs.existsSync(filePath)) {
+    fs.writeFileSync(filePath, '', { flag: 'wx' });
   }
 }
