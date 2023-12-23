@@ -1,34 +1,33 @@
 import { promises as fs ,existsSync} from "fs";
 import {createIfNot} from "./utils/fileUtils.js"
 import * as  path from "node:path"
+import { getNamedArgs } from "./utils/args.js";
+const args = getNamedArgs();
 async function writeSQL(statement: string, saveFileAs = "", isAppend: boolean = false) {
   try {
-    const destinationFile = process.argv[2] || saveFileAs;
+    const destinationFile = args.get('csv') || saveFileAs;
     if (!destinationFile) {
       throw new Error("Missing saveFileAs parameter");
     }
-    createIfNot(path.resolve(`./sql/${destinationFile}.sql`))
+createIfNot(path.resolve(`./sql/${destinationFile}.sql`))
 		if(isAppend){
-      await fs.appendFile(`sql/${process.argv[2]}.sql`, statement);
+      await fs.appendFile(`sql/${args.get('csv')}.sql`, statement);
     }else{
-      await fs.writeFile(`sql/${process.argv[2]}.sql`, statement);
-    }
+    await fs.writeFile(`sql/${args.get('csv')}.sql`, statement);
+}
   } catch (err) {
     console.log(err);
   }
 }
-
 async function readCSV(csvFileName = "", batchSize: number = 0) {
   try {
-    const fileAndTableName = process.argv[2] || csvFileName;
-    
+    const fileAndTableName = args.get('csv') || csvFileName;
     batchSize = parseInt(process.argv[3]) || batchSize || 500;
 		let isAppend: boolean = false;
-
     if (!fileAndTableName) {
       throw new Error("Missing csvFileName parameter");
     }
-    if(!existsSync(path.resolve(`./csv/${fileAndTableName}.csv`))){
+if(!existsSync(path.resolve(`./csv/${fileAndTableName}.csv`))){
       console.log("file not found")
       return
     }
@@ -51,19 +50,15 @@ async function readCSV(csvFileName = "", batchSize: number = 0) {
         console.log(arr);
         throw new Error("Too Few Values in row");
       }
-
       // Check batch size (rows per batch)
       if(index > 0 && index % batchSize == 0){
         values = values.slice(0, -2) + ";\n\n";
-    
         const sqlStatement = beginSQLInsert + values;
-    
         // Write File 
         writeSQL(sqlStatement, fileAndTableName, isAppend);
         values = "";
         isAppend = true;
       }
-      
       let valueLine = "\t(";
       arr.forEach((value) => {
         // Matches NULL values, Numbers,
