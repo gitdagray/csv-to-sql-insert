@@ -1,17 +1,19 @@
 import { promises as fs ,existsSync} from "fs";
 import {createIfNot} from "./utils/fileUtils.js"
 import * as  path from "node:path"
+import { getNamedArgs } from "./utils/args.js";
+const args = getNamedArgs();
 async function writeSQL(statement: string, saveFileAs = "", isAppend: boolean = false) {
   try {
-    const destinationFile = process.argv[2] || saveFileAs;
+    const destinationFile = args.get('csv') || saveFileAs;
     if (!destinationFile) {
       throw new Error("Missing saveFileAs parameter");
     }
 createIfNot(path.resolve(`./sql/${destinationFile}.sql`))
 		if(isAppend){
-      await fs.appendFile(`sql/${process.argv[2]}.sql`, statement);
+      await fs.appendFile(`sql/${args.get('csv')}.sql`, statement);
     }else{
-    await fs.writeFile(`sql/${process.argv[2]}.sql`, statement);
+    await fs.writeFile(`sql/${args.get('csv')}.sql`, statement);
 }
   } catch (err) {
     console.log(err);
@@ -19,7 +21,7 @@ createIfNot(path.resolve(`./sql/${destinationFile}.sql`))
 }
 async function readCSV(csvFileName = "", batchSize: number = 0) {
   try {
-    const fileAndTableName = process.argv[2] || csvFileName;
+    const fileAndTableName = args.get('csv') || csvFileName;
     batchSize = parseInt(process.argv[3]) || batchSize || 500;
 		let isAppend: boolean = false;
     if (!fileAndTableName) {
