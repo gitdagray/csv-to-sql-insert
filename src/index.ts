@@ -1,16 +1,17 @@
-import { promises as fs ,existsSync} from "fs";
-import {createIfNot} from "./utils/fileUtils.js"
-import * as  path from "node:path"
-async function writeSQL(statement: string, saveFileAs = "", isAppend: boolean = false) {
+import { promises as fs, existsSync } from 'fs';
+import { createIfNot } from './utils/fileUtils.js';
+import * as path from 'node:path';
+
+async function writeSQL(statement: string, saveFileAs = '', isAppend: boolean = false) {
   try {
     const destinationFile = process.argv[2] || saveFileAs;
     if (!destinationFile) {
-      throw new Error("Missing saveFileAs parameter");
+      throw new Error('Missing saveFileAs parameter');
     }
-    createIfNot(path.resolve(`./sql/${destinationFile}.sql`))
-		if(isAppend){
+    createIfNot(path.resolve(`./sql/${destinationFile}.sql`));
+    if (isAppend) {
       await fs.appendFile(`sql/${process.argv[2]}.sql`, statement);
-    }else{
+    } else {
       await fs.writeFile(`sql/${process.argv[2]}.sql`, statement);
     }
   } catch (err) {
@@ -18,58 +19,58 @@ async function writeSQL(statement: string, saveFileAs = "", isAppend: boolean = 
   }
 }
 
-async function readCSV(csvFileName = "", batchSize: number = 0) {
+async function readCSV(csvFileName = '', batchSize: number = 0) {
   try {
     const fileAndTableName = process.argv[2] || csvFileName;
-    
+
     batchSize = parseInt(process.argv[3]) || batchSize || 500;
-		let isAppend: boolean = false;
+    let isAppend: boolean = false;
 
     if (!fileAndTableName) {
-      throw new Error("Missing csvFileName parameter");
+      throw new Error('Missing csvFileName parameter');
     }
-    if(!existsSync(path.resolve(`./csv/${fileAndTableName}.csv`))){
-      console.log("file not found")
-      return
+    if (!existsSync(path.resolve(`./csv/${fileAndTableName}.csv`))) {
+      console.log('file not found');
+      return;
     }
     const data = await fs.readFile(`csv/${fileAndTableName}.csv`, {
-      encoding: "utf8",
+      encoding: 'utf8',
     });
     const linesArray = data.split(/\r|\n/).filter((line) => line);
-    const columnNames = linesArray?.shift()?.split(",") || [];
-    
+    const columnNames = linesArray?.shift()?.split(',') || [];
+
     // Improved string manipulation using array join
     const beginSQLInsert = `INSERT INTO ${fileAndTableName} (${columnNames.join(', ')})\nVALUES\n`;
 
-    let values = "";
+    let values = '';
     linesArray.forEach((line, index) => {
       // Parses each line of CSV into field values array
       const arr = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
       if (arr.length > columnNames.length) {
         console.log(arr);
-        throw new Error("Too Many Values in row");
+        throw new Error('Too Many Values in row');
       } else if (arr.length < columnNames.length) {
         console.log(arr);
-        throw new Error("Too Few Values in row");
+        throw new Error('Too Few Values in row');
       }
 
       // Check batch size (rows per batch)
-      if(index > 0 && index % batchSize == 0){
-        values = values.slice(0, -2) + ";\n\n";
-    
+      if (index > 0 && index % batchSize == 0) {
+        values = values.slice(0, -2) + ';\n\n';
+
         const sqlStatement = beginSQLInsert + values;
-    
-        // Write File 
+
+        // Write File
         writeSQL(sqlStatement, fileAndTableName, isAppend);
-        values = "";
+        values = '';
         isAppend = true;
       }
-      
-      let valueLine = "\t(";
+
+      let valueLine = '\t(';
       arr.forEach((value) => {
         // Matches NULL values, Numbers,
         // Strings accepted as numbers, and Booleans (0 or 1)
-        if (value === "NULL" || !isNaN(+value)) {
+        if (value === 'NULL' || !isNaN(+value)) {
           valueLine += `${value}, `;
         } else {
           // If a string is wrapped in quotes, it doesn't need more
@@ -81,10 +82,10 @@ async function readCSV(csvFileName = "", batchSize: number = 0) {
           }
         }
       });
-      valueLine = valueLine.slice(0, -2) + "),\n";
+      valueLine = valueLine.slice(0, -2) + '),\n';
       values += valueLine;
     });
-    values = values.slice(0, -2) + ";";
+    values = values.slice(0, -2) + ';';
     const sqlStatement = beginSQLInsert + values;
     // Write File
     writeSQL(sqlStatement, fileAndTableName, isAppend);
@@ -92,5 +93,6 @@ async function readCSV(csvFileName = "", batchSize: number = 0) {
     console.log(err);
   }
 }
+
 readCSV();
-console.log("Finished!");
+console.log('Finished!');
