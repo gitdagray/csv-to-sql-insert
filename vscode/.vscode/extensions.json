@@ -1,0 +1,10 @@
+{
+	"recommendations": [
+		"editorconfig.editorconfig",
+		"christian-kohler.npm-intellisense",
+		"dbaeumer.vscode-eslint",
+		"orta.vscode-jest",
+		"esbenp.prettier-vscode",
+		"ms-vscode.js-debug"
+	]
+}
