@@ -37,9 +37,7 @@ async function readCSV(csvFileName = "", batchSize: number = 0) {
     });
     const linesArray = data.split(/\r|\n/).filter((line) => line);
     const columnNames = linesArray?.shift()?.split(",") || [];
-    let beginSQLInsert = `INSERT INTO ${fileAndTableName} (`;
-    columnNames.forEach((name) => (beginSQLInsert += `${name}, `));
-    beginSQLInsert = beginSQLInsert.slice(0, -2) + ")\nVALUES\n";
+    const beginSQLInsert = `INSERT INTO ${fileAndTableName} (${columnNames.join(", ")})\nVALUES\n`;
     let values = "";
     linesArray.forEach((line, index) => {
       // Parses each line of CSV into field values array
