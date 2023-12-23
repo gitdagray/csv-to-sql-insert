@@ -4,6 +4,7 @@ module.exports = {
 		es2021: true,
 		node: true,
 	},
+	parser: '@typescript-eslint/parser',
 	parserOptions: {
 		ecmaVersion: 'latest',
 		sourceType: 'module',
@@ -11,7 +12,6 @@ module.exports = {
 	overrides: [
 		{
 			files: ['**/*.ts'],
-			parser: '@typescript-eslint/parser',
 			plugins: ['@typescript-eslint'],
 			extends: ['plugin:@typescript-eslint/recommended'],
 			rules: {
