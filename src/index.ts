@@ -1,4 +1,5 @@
 import { promises as fs ,existsSync} from "fs";
+import {createIfNot} from "./utils/fileUtils.js"
 import * as  path from "node:path"
 
 async function writeSQL(statement: string, saveFileAs = "", isAppend: boolean = false) {
@@ -7,6 +8,8 @@ async function writeSQL(statement: string, saveFileAs = "", isAppend: boolean = 
     if (!destinationFile) {
       throw new Error("Missing saveFileAs parameter");
     }
+
+    createIfNot(path.resolve('./sql/'))
 
 		if(isAppend){
       await fs.appendFile(`sql/${saveFileAs}.sql`, statement);
