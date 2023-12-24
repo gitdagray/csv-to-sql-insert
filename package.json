@@ -1,11 +1,11 @@
 {
   "name": "csv-to-sql-insert",
   "version": "0.1.0",
-  "type": "module",
   "repository": "https://github.com/gitdagray/csv-to-sql",
   "description": "input a csv file, output a sql insert statement",
   "main": "index.js",
   "scripts": {
+    "dev:ts": "nodemon src/index.ts",
     "start": "npm run build && node dist/index.js",
     "build": "tsc  --skipLibCheck"
   },
@@ -29,8 +29,10 @@
     "eslint-plugin-prettier": "^5.1.1",
     "eslint-plugin-promise": "^6.1.1",
     "husky": "^8.0.3",
+    "nodemon": "^3.0.2",
     "prettier": "^3.1.1",
     "pretty-quick": "^3.1.3",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   },
   "husky": {
