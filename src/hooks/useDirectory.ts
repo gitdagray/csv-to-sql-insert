@@ -1,32 +1,17 @@
-import { existsSync, mkdirSync } from "fs";
-import { appendFile, writeFile } from "fs/promises";
+import { existsSync, mkdirSync, writeFileSync } from "fs";
+import path from "path";
 
 export const useDirectory = () => {
-    const createDirIfNot = async (dir: string) => {
-        if (!existsSync(dir)) {
-            mkdirSync(dir, { recursive: true });
-        }
-    };
     // append data
     const append = async (data: string, dest: string) => {
-        try {
-            await appendFile(`${process.cwd()}/sql/${dest}.sql`, data);
-        } catch (error) {
-            console.error(`Fail to append data into ${dest}.sql`);
+        const output = path.dirname(`sql/${dest}.sql`);
+        if (!existsSync(output)) {
+            mkdirSync(output, { recursive: true });
         }
-    };
-
-    const write = async (data: string, dest: string) => {
-        try {
-            await writeFile(`${process.cwd()}/sql/${dest}.sql`, data);
-        } catch (error) {
-            console.error(`Fail to write ${dest}.sql file!`);
-        }
+        writeFileSync(`sql/${dest}.sql`, data);
     };
 
     return {
-        write,
         append,
-        createDirIfNot,
     };
 };
