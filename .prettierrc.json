@@ -1,0 +1,19 @@
+{
+    "printWidth": 100,
+
+    "singleQuote": true,
+
+    "semi": false,
+
+    "tabWidth": 4,
+
+    "useTabs": false,
+
+    "trailingComma": "none",
+
+    "endOfLine": "auto",
+
+    "singleAttributePerLine": true,
+
+    "htmlWhitespaceSensitivity": "ignore"
+}
