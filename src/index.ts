@@ -1,6 +1,7 @@
 import { promises as fs ,existsSync} from "fs";
-import {createIfNot} from "./utils/fileUtils.js"
-import * as  path from "node:path"
+import {createIfNot} from "./utils/fileUtils.js";
+import * as path from "node:path";
+
 async function writeSQL(statement: string, saveFileAs = "", isAppend: boolean = false) {
   try {
     const destinationFile = process.argv[2] || saveFileAs;
@@ -91,5 +92,6 @@ async function readCSV(csvFileName = "", batchSize: number = 0) {
     console.log(err);
   }
 }
+
 readCSV();
 console.log("Finished!");
