@@ -7,7 +7,9 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run build && node dist/index.js",
-    "build": "tsc  --skipLibCheck"
+    "build": "tsc  --skipLibCheck",
+    "lint": "eslint --ext .ts src/",
+    "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"
   },
   "author": {
     "name": "Dave Gray",
