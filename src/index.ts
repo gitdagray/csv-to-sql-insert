@@ -3,15 +3,15 @@ import {createIfNot} from "./utils/fileUtils.js"
 import * as  path from "node:path"
 async function writeSQL(statement: string, saveFileAs = "", isAppend: boolean = false) {
   try {
-    const destinationFile = process.argv[2] || saveFileAs;
+    const destinationFile = saveFileAs;
     if (!destinationFile) {
       throw new Error("Missing saveFileAs parameter");
     }
     createIfNot(path.resolve(`./sql/${destinationFile}.sql`))
 		if(isAppend){
-      await fs.appendFile(`sql/${process.argv[2]}.sql`, statement);
+      await fs.appendFile(`sql/${destinationFile}.sql`, statement);
     }else{
-      await fs.writeFile(`sql/${process.argv[2]}.sql`, statement);
+      await fs.writeFile(`sql/${destinationFile}.sql`, statement);
     }
   } catch (err) {
     console.log(err);
@@ -20,7 +20,7 @@ async function writeSQL(statement: string, saveFileAs = "", isAppend: boolean = 
 
 async function readCSV(csvFileName = "", batchSize: number = 0) {
   try {
-    const fileAndTableName = process.argv[2] || csvFileName;
+    const fileAndTableName = csvFileName;
     
     batchSize = parseInt(process.argv[3]) || batchSize || 500;
 		let isAppend: boolean = false;
@@ -91,5 +91,20 @@ async function readCSV(csvFileName = "", batchSize: number = 0) {
     console.log(err);
   }
 }
-readCSV();
+var args = process.argv[2];
+if(args === "all") {
+  const files = await fs.readdir("./csv")
+  files.forEach(file => {
+    if(file.includes(".csv")) {
+      const tableName = file.slice(0, -4);
+      console.log(`Reading ${tableName}...`);
+      readCSV(tableName);
+    }
+  })
+}
+else{
+  console.log(`Reading ${args}...`);
+  readCSV(args)
+}
+
 console.log("Finished!");

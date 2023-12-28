@@ -1,22 +1,24 @@
 import fs from "node:fs/promises"
 import { existsSync } from "node:fs"
-import { createIfNot } from "./utils/fileUtils.mjs"
+import { createIfNot } from "./utils/fileUtils.js"
 import path from "node:path"
+
 async function writeSQL(statement, saveFileAs = "") {
   try {
-    const destinationFile = process.argv[2] || saveFileAs
+    const destinationFile = saveFileAs;
     if (!destinationFile) {
       throw new Error("Missing saveFileAs parameter")
     }
     createIfNot(path.resolve(`./sql/${destinationFile}`))
-    await fs.writeFile(`sql/${process.argv[2]}.sql`, statement)
+    await fs.writeFile(`sql/${destinationFile}.sql`, statement)
   } catch (err) {
     console.log(err)
   }
 }
+
 async function readCSV(csvFileName = "") {
   try {
-    const fileAndTableName = process.argv[2] || csvFileName
+    const fileAndTableName = csvFileName;
     if (!fileAndTableName) {
       throw new Error("Missing csvFileName parameter")
     }
@@ -27,6 +29,7 @@ async function readCSV(csvFileName = "") {
     const data = await fs.readFile(`csv/${fileAndTableName}.csv`, {
       encoding: "utf8",
     })
+
     const linesArray = data.split(/\r|\n/).filter(line => line)
     const columnNames = linesArray.shift().split(",")
     let beginSQLInsert = `INSERT INTO ${fileAndTableName} (`
@@ -70,5 +73,8 @@ async function readCSV(csvFileName = "") {
     console.log(err)
   }
 }
-readCSV()
+
+var args = process.argv[2];
+readCSV(args);
+
 console.log("Finished!")
