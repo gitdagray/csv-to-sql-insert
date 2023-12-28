@@ -7,14 +7,14 @@ async function writeSQL(statement: string, saveFileAs = "", isAppend: boolean = 
     if (!destinationFile) {
       throw new Error("Missing saveFileAs parameter");
     }
-    createIfNot(path.resolve(`./sql/${destinationFile}.sql`))
+    createIfNot(path.resolve(`./sql`))
 		if(isAppend){
       await fs.appendFile(`sql/${process.argv[2]}.sql`, statement);
     }else{
       await fs.writeFile(`sql/${process.argv[2]}.sql`, statement);
     }
   } catch (err) {
-    console.log(err);
+    console.log("Error:",err);
   }
 }
 
