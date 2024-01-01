@@ -4,10 +4,12 @@ import { EStatus, readLine } from "./utils";
 import { validateString } from "./validator";
 import { useDirectory } from "./hooks/useDirectory";
 import { response } from "./libs";
+import { progress } from "./plugins";
 
 class Main {
+    private destinationFile: string = "";
     private fileName: string = "";
-    public destinationFile: string = "";
+
     constructor() {
         // Take file name from console
         readLine.question("Enter your CSV file name: ", (fileName) => {
@@ -40,6 +42,7 @@ class Main {
             } else {
                 this.destinationFile = this.fileName;
             }
+            this.progressbar();
             this.readCSV(filePath);
         });
     };
@@ -47,6 +50,8 @@ class Main {
      * CSV Reader
      */
     readCSV = async (filePath: string) => {
+        // default when readCSV is called then our progressing will be true
+        this.progressbar(true);
         try {
             const data = await fs.readFile(filePath, {
                 encoding: "utf8",
@@ -136,6 +141,7 @@ class Main {
      * End message
      */
     endMessage = (status: EStatus) => {
+        this.progressbar(false);
         /**
          * TODO
          * Handle all status like error pending etc...
@@ -158,6 +164,12 @@ class Main {
                     "Something went wrong!"
                 );
         }
+    };
+    /**
+     * show progressbar when data is on processing
+     */
+    progressbar = (isActive: boolean = false) => {
+        // creating a progress bar
     };
 }
 
