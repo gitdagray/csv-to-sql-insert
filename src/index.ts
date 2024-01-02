@@ -4,7 +4,6 @@ import { EStatus, readLine } from "./utils";
 import { validateString } from "./validator";
 import { useDirectory } from "./hooks/useDirectory";
 import { response } from "./libs";
-import { progress } from "./plugins";
 
 class Main {
     private destinationFile: string = "";
@@ -37,12 +36,12 @@ class Main {
         // destination of our output sql file
         readLine.question("Destination name(file): ", (destinationFile) => {
             // directory name exist or not
-            if (destinationFile.length > 1) {
-                this.destinationFile = destinationFile;
-            } else {
+            if (!destinationFile || destinationFile.trim() === "") {
                 this.destinationFile = this.fileName;
+            } else {
+                this.destinationFile = destinationFile;
             }
-            this.progressbar();
+
             this.readCSV(filePath);
         });
     };
@@ -51,7 +50,6 @@ class Main {
      */
     readCSV = async (filePath: string) => {
         // default when readCSV is called then our progressing will be true
-        this.progressbar(true);
         try {
             const data = await fs.readFile(filePath, {
                 encoding: "utf8",
@@ -70,15 +68,20 @@ class Main {
     writeSQL = async (statement: string) => {
         const { append } = useDirectory();
         try {
+            this.endMessage(EStatus.PENDING);
+            // await append();
             await append(statement, this.destinationFile);
             this.endMessage(EStatus.SUCCESS);
         } catch (err) {
             this.endMessage(EStatus.ERROR);
+        } finally {
+            this.endMessage(EStatus.COMPLETE);
         }
     };
 
     /**
-     * CSV Processing
+     * CSV data Processing for writing SQL
+     * @param {string} data
      */
     process = async (data: string) => {
         if (!validateString(data) || data.length < 10)
@@ -99,10 +102,7 @@ class Main {
             const newArray: string[] = line.split(
                 /,(?=(?:(?:[^"]*"){2})*[^"]*$)/
             );
-            if (
-                newArray.length > columnNames.length &&
-                newArray.length < columnNames.length
-            )
+            if (newArray.length !== columnNames.length)
                 throw new Error("Invalid row items or column items :( ");
             /**
              * TODO:
@@ -138,15 +138,18 @@ class Main {
         this.writeSQL(`${beginSQLInsert}${values}`);
     };
     /**
-     * End message
+     * End of the console message
+     * @param {EStatus} status
      */
     endMessage = (status: EStatus) => {
-        this.progressbar(false);
         /**
          * TODO
          * Handle all status like error pending etc...
          */
         switch (status) {
+            case EStatus.PENDING:
+                this.progressbar();
+                break;
             case EStatus.SUCCESS:
                 response(this.fileName, this.destinationFile);
                 break;
@@ -156,6 +159,9 @@ class Main {
                     this.destinationFile,
                     "Fail to convert file!"
                 );
+                break;
+            case EStatus.COMPLETE:
+                this.progressbar();
                 break;
             default:
                 response(
@@ -167,9 +173,15 @@ class Main {
     };
     /**
      * show progressbar when data is on processing
+     * @returns {void} nothing will returns
+     * Since it's just a progressbar
      */
-    progressbar = (isActive: boolean = false) => {
-        // creating a progress bar
+    progressbar = (): void => {
+        // progress bar
+        // const barLength = 50;
+        // const progressBar = Array(barLength).fill(" ");
+        // if(progressBar){
+        // }
     };
 }
 
