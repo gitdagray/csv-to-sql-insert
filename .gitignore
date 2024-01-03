@@ -6,3 +6,4 @@ package-lock.json
 pnpm-lock.yaml
 sql
 .DS_Store
+csv/long2.csv

@@ -1,31 +1,22 @@
 import { SingleBar } from "cli-progress";
 import { cyan } from "ansi-colors";
 
-export const progress = () => {
-    let pg = 0;
-
+export const progress = (total: number) => {
     const bar = new SingleBar({
-        format:
-            "CLI Progress |" +
-            cyan("{bar}") +
-            "| {percentage}% || {value}/{total} Chunks || Speed: {speed}",
-        align: "left",
-        autopadding: true,
-        barsize: 10,
-        hideCursor: true,
-        synchronousUpdate: true,
+        format: "Inserting |" + cyan("{bar}") + "| {percentage}% || CSV to SQL",
         barCompleteChar: "\u2588",
         barIncompleteChar: "\u2591",
+        hideCursor: true,
     });
-    // initialize the bar - defining payload token "speed" with the default value "N/A"
-    bar.start(100, 0, {
-        speed: "N/A",
-    });
+    /** start */
+    bar.start(100, total);
 
-    // update values
-    bar.increment();
-    bar.update(30);
+    const timer = setInterval(() => {
+        bar.update(total);
+    }, 20);
 
-    // stop the bar
-    bar.stop();
+    if (total >= 200) {
+        clearInterval(timer);
+        bar.stop();
+    }
 };

@@ -4,15 +4,17 @@ import { EStatus, readLine } from "./utils";
 import { validateString } from "./validator";
 import { useDirectory } from "./hooks/useDirectory";
 import { response } from "./libs";
+import { progress } from "./plugins";
 
 class Main {
     private destinationFile: string = "";
     private fileName: string = "";
+    private index: number = 0;
 
     constructor() {
         // Take file name from console
         readLine.question("Enter your CSV file name: ", (fileName) => {
-            // file name exist or not
+            /** file name exist or not */
             if (!validateString(fileName))
                 return new Error("Missing csvFileName parameter");
             /**
@@ -49,12 +51,12 @@ class Main {
      * CSV Reader
      */
     readCSV = async (filePath: string) => {
-        // default when readCSV is called then our progressing will be true
+        /** default when readCSV is called then our progressing will be true */
         try {
             const data = await fs.readFile(filePath, {
                 encoding: "utf8",
             });
-            //  We got data. so now let's process our data :)
+            /**  We got data. so now let's process our data :) */
             //  console.log("data: ", data);
             this.process(data ?? "");
         } catch (error) {
@@ -69,7 +71,6 @@ class Main {
         const { append } = useDirectory();
         try {
             this.endMessage(EStatus.PENDING);
-            // await append();
             await append(statement, this.destinationFile);
             this.endMessage(EStatus.SUCCESS);
         } catch (err) {
@@ -139,16 +140,16 @@ class Main {
     };
     /**
      * End of the console message
-     * @param {EStatus} status
+     * @param {EStatus} status progressing status
      */
     endMessage = (status: EStatus) => {
         /**
-         * TODO
+         * TODO:
          * Handle all status like error pending etc...
          */
         switch (status) {
             case EStatus.PENDING:
-                this.progressbar();
+                this.progressbar(true);
                 break;
             case EStatus.SUCCESS:
                 response(this.fileName, this.destinationFile);
@@ -161,7 +162,7 @@ class Main {
                 );
                 break;
             case EStatus.COMPLETE:
-                this.progressbar();
+                this.progressbar(false);
                 break;
             default:
                 response(
@@ -173,15 +174,15 @@ class Main {
     };
     /**
      * show progressbar when data is on processing
+     * @param {boolean} isActive based on this active status progressbar will be shows
      * @returns {void} nothing will returns
      * Since it's just a progressbar
      */
-    progressbar = (): void => {
-        // progress bar
-        // const barLength = 50;
-        // const progressBar = Array(barLength).fill(" ");
-        // if(progressBar){
-        // }
+    progressbar = (isActive: boolean): void => {
+        if (isActive) {
+            this.index++;
+            progress(this.index);
+        }
     };
 }
 
