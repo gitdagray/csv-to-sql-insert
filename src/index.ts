@@ -87,9 +87,10 @@ async function readCSV(csvFileName = "", batchSize: number = 0) {
     const sqlStatement = beginSQLInsert + values;
     // Write File
     writeSQL(sqlStatement, fileAndTableName, isAppend);
+
+    console.log(`SQL file created \x1B[32m${fileAndTableName}.sql\x1B[0m`);
   } catch (err) {
     console.log(err);
   }
 }
 readCSV();
-console.log("Finished!");
