@@ -1,6 +1,6 @@
 {
     "name": "csv-to-sql-insert",
-    "version": "0.1.0",
+    "version": "0.1.4",
     "repository": "https://github.com/gitdagray/csv-to-sql",
     "description": "input a csv file, output a sql insert statement",
     "main": "index.js",
@@ -8,6 +8,7 @@
         "dev:ts": "nodemon src/index.ts",
         "start": "npm run build && node dist/index.js",
         "fix-memory-limit": "cross-env LIMIT=2048 increase-memory-limit",
+        "format": "prettier --write \"**/*.{ts,tsx,md}\"",
         "build": "tsc  --skipLibCheck"
     },
     "author": {
@@ -17,7 +18,6 @@
     },
     "license": "MIT",
     "devDependencies": {
-        "@types/cli-progress": "^3.11.5",
         "@types/node": "^20.10.5",
         "@typescript-eslint/eslint-plugin": "^6.15.0",
         "cross-env": "^7.0.3",
@@ -45,7 +45,7 @@
         }
     },
     "dependencies": {
-        "ansi-colors": "^4.1.3",
-        "cli-progress": "^3.12.0"
+        "cli-loading-animation": "^1.0.6",
+        "cli-spinners": "^2.9.2"
     }
 }

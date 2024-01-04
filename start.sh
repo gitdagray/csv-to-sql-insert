@@ -1,7 +1,7 @@
-# #!/bin/bash
-# # Usage: Run CSV to SQL Inserter
-# # Author: Dave Gray
-# # ------------------------------------------------- #
+#!/bin/bash
+# Usage: Run CSV to SQL Inserter
+# Author: Dave Gray
+# ------------------------------------------------- #
 echo "Removing node modules & dist (if have)"
 # Check if the directory exists before attempting to remove it
 if [ -d "node_modules" ] || [ -d "dist" ]; then

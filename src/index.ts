@@ -4,15 +4,21 @@ import { EStatus, readLine } from "./utils";
 import { validateString } from "./validator";
 import { useDirectory } from "./hooks/useDirectory";
 import { response } from "./libs";
-import { progress } from "./plugins";
+// import { loading } from "cli-loading-animation";
+// import { fistBump } from "cli-spinners";
 
 class Main {
     private destinationFile: string = "";
     private fileName: string = "";
-    private index: number = 0;
 
-    constructor() {
-        // Take file name from console
+    public run = () => {
+        this.askFileName();
+    };
+
+    private askFileName = () => {
+        /** Initialize progress bar */
+
+        /** Take file name from console */
         readLine.question("Enter your CSV file name: ", (fileName) => {
             /** file name exist or not */
             if (!validateString(fileName))
@@ -30,28 +36,30 @@ class Main {
                 this.askDestinationFile(filePath);
             }
         });
-    }
+    };
     /**
      * Dicretory name reader
      */
-    askDestinationFile = (filePath: string) => {
-        // destination of our output sql file
+    private askDestinationFile = (filePath: string) => {
+        /** destination of our output sql file */
         readLine.question("Destination name(file): ", (destinationFile) => {
-            // directory name exist or not
+            /** directory name exist or not */
             if (!destinationFile || destinationFile.trim() === "") {
                 this.destinationFile = this.fileName;
             } else {
                 this.destinationFile = destinationFile;
             }
-
+            /** should start here our snipper */
+            console.log("Inserting....");
             this.readCSV(filePath);
         });
     };
     /**
      * CSV Reader
      */
-    readCSV = async (filePath: string) => {
+    private readCSV = async (filePath: string) => {
         /** default when readCSV is called then our progressing will be true */
+
         try {
             const data = await fs.readFile(filePath, {
                 encoding: "utf8",
@@ -67,16 +75,15 @@ class Main {
     /**
      * Write SQL code
      */
-    writeSQL = async (statement: string) => {
+    private writeSQL = async (statement: string) => {
         const { append } = useDirectory();
         try {
-            this.endMessage(EStatus.PENDING);
-            await append(statement, this.destinationFile);
-            this.endMessage(EStatus.SUCCESS);
+            const res = await append(statement, this.destinationFile);
+            if (res) {
+                this.responseMessage(EStatus.SUCCESS);
+            }
         } catch (err) {
-            this.endMessage(EStatus.ERROR);
-        } finally {
-            this.endMessage(EStatus.COMPLETE);
+            this.responseMessage(EStatus.ERROR);
         }
     };
 
@@ -84,7 +91,7 @@ class Main {
      * CSV data Processing for writing SQL
      * @param {string} data
      */
-    process = async (data: string) => {
+    private process = async (data: string) => {
         if (!validateString(data) || data.length < 10)
             return console.log("Invalid data");
 
@@ -142,15 +149,13 @@ class Main {
      * End of the console message
      * @param {EStatus} status progressing status
      */
-    endMessage = (status: EStatus) => {
+    private responseMessage = (status: EStatus) => {
         /**
          * TODO:
          * Handle all status like error pending etc...
          */
+        console.log("Progressing finished...");
         switch (status) {
-            case EStatus.PENDING:
-                this.progressbar(true);
-                break;
             case EStatus.SUCCESS:
                 response(this.fileName, this.destinationFile);
                 break;
@@ -160,9 +165,6 @@ class Main {
                     this.destinationFile,
                     "Fail to convert file!"
                 );
-                break;
-            case EStatus.COMPLETE:
-                this.progressbar(false);
                 break;
             default:
                 response(
@@ -178,12 +180,8 @@ class Main {
      * @returns {void} nothing will returns
      * Since it's just a progressbar
      */
-    progressbar = (isActive: boolean): void => {
-        if (isActive) {
-            this.index++;
-            progress(this.index);
-        }
-    };
+    public progressbar = (isActive: boolean): void => {};
 }
 
-new Main();
+const inserter = new Main();
+inserter.run();
