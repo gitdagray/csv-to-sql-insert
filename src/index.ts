@@ -90,7 +90,7 @@ async function readCSV(csvFileName = "", batchSize: number = 0) {
 
     console.log(`SQL file created \x1B[32m${fileAndTableName}.sql\x1B[0m`);
   } catch (err) {
-    console.log(err);
+    console.log(`\x1B[31m Error:\x1B[0m ${err}`);
   }
 }
 readCSV();
