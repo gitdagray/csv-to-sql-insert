@@ -1,6 +1,76 @@
 import { promises as fs ,existsSync} from "fs";
 import {createIfNot} from "./utils/fileUtils.js"
 import * as  path from "node:path"
+import XLSX from "xlsx";
+
+// Reading XLSX file
+const XLSX = require('xlsx');
+async function readXLSX(fileName) {
+  try {
+    const workbook = XLSX.readFile(fileName);
+    const sheetName = workbook.SheetNames[0]; // Assuming data is in the first sheet
+    const worksheet = workbook.Sheets[sheetName];
+    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+
+    // Process the JSON data here
+    const columnNames = Object.keys(jsonData[0]);
+    let beginSQLInsert = `INSERT INTO ${path.basename(fileName, path.extname(fileName))} (`;
+    columnNames.forEach((name) => (beginSQLInsert += `${name}, `));
+    beginSQLInsert = beginSQLInsert.slice(0, -2) + ")\nVALUES\n";
+
+    let values = "";
+    jsonData.forEach((row, index) => {
+      // Validate row length
+      if (Object.keys(row).length !== columnNames.length) {
+        console.log(row);
+        throw new Error("Invalid row length in XLSX data");
+      }
+
+      // Check batch size
+      if (index > 0 && index % batchSize === 0) {
+        values = values.slice(0, -2) + ";\n\n";
+        const sqlStatement = beginSQLInsert + values;
+        writeSQL(sqlStatement, path.basename(fileName, path.extname(fileName)), isAppend);
+        values = "";
+        isAppend = true;
+      }
+
+      let valueLine = "\t(";
+      columnNames.forEach((name) => {
+        const value = row[name];
+        valueLine += `${value === "NULL" || !isNaN(+value) ? value : `"${value}"`}, `;
+      });
+      valueLine = valueLine.slice(0, -2) + "),\n";
+      values += valueLine;
+    });
+
+    values = values.slice(0, -2) + ";";
+    const sqlStatement = beginSQLInsert + values;
+    writeSQL(sqlStatement, path.basename(fileName, path.extname(fileName)), isAppend);
+
+  } catch (err) {
+    console.error("Error reading XLSX file:", err);
+  }
+}
+
+// Handle both CSV and XLSV Files
+async function readFile(fileName, batchSize) {
+  const fileExtension = path.extname(fileName).toLowerCase();
+  if (fileExtension === ".csv") {
+    await readCSV(fileName, batchSize);
+  } else if (fileExtension === ".xlsx" || fileExtension === ".xls") {
+    await readXLSX(fileName);
+  } else {
+    console.error("Unsupported file type:", fileExtension);
+  }
+}
+
+// Example usage:
+// readFile("my_data.xlsx");
+
+
+
 async function writeSQL(statement: string, saveFileAs = "", isAppend: boolean = false) {
   try {
     const destinationFile = process.argv[2] || saveFileAs;
