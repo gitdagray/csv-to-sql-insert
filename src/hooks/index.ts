@@ -1,1 +1,1 @@
-export * from "./useDirectory";
+export * from "./useDirectory.js";
