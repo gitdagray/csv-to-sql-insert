@@ -49,7 +49,7 @@ const main = async () => {
     );
     try {
         /** read data from the csv file */
-        const data = await insert.readingCSVFile();
+        const data = insert.readingCSVFile();
         /** process and write sql code within this method */
         await insert.processingCSVFile(data, fileNameSkipExtension);
         stop();

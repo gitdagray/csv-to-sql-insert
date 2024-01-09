@@ -13,14 +13,9 @@ export class CsvToSql {
     /**
      * Read CSV File
      */
-    public readingCSVFile = (): Promise<string> => {
-        return new Promise((resolve, reject) => {
-            resolve(
-                readFileSync(`${process.cwd()}/csv/${this.filename}.csv`, {
-                    encoding: "utf8",
-                })
-            );
-            reject(new Error("Fail to read file"));
+    public readingCSVFile = (): string => {
+        return readFileSync(`${process.cwd()}/csv/${this.filename}.csv`, {
+            encoding: "utf8",
         });
     };
 
