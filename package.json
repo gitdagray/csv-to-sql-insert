@@ -1,6 +1,6 @@
 {
     "name": "csv-to-sql-insert",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "type": "module",
     "repository": "https://github.com/gitdagray/csv-to-sql",
     "description": "input a csv file, output a sql insert statement",

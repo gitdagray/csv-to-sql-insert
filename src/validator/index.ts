@@ -1,5 +1,5 @@
 export const validate = (value: any): value is string => {
-    if (!value || typeof value !== "string") {
+    if (!value || typeof value !== "string" || value.length < 1) {
         return false;
     }
     return true;
@@ -12,5 +12,5 @@ export const validate = (value: any): value is string => {
  * @example `example.csv`
  * @returns {string} validFilename
  */
-export const validFileName = (fileNameWithExtension: string): string =>
+export const skipExtension = (fileNameWithExtension: string): string =>
     fileNameWithExtension.split(".")[0] as string;
