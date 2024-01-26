@@ -1,12 +1,24 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "es2020",
     "module": "ES2020",
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
-    "noEmitOnError": true
+    "noEmitOnError": true,
+    "types": ["node","jest"],
+    "esModuleInterop": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]
+,
+  "ts-node": {
+    // these options are overrides used only by ts-node
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  }
+
 }
