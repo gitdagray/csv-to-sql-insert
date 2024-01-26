@@ -2,6 +2,7 @@ import { writeSQL } from "../index";
 
 import { promises as fs, existsSync} from "fs";
 
+//I DECIDED TO TEST WRITESQL FUNCTION BECAUSE READ CSV ULTIMATELY CALLS UPON WRITE SQL
 
 describe('csv to sql test suite', () => {
     jest.mock('fs', () => ({
