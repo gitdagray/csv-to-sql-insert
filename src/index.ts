@@ -1,7 +1,11 @@
 import { promises as fs ,existsSync} from "fs";
-import {createIfNot} from "./utils/fileUtils.js"
+
+import {createIfNot} from "./utils/fileUtils.ts"
 import * as  path from "node:path"
-async function writeSQL(statement: string, saveFileAs = "", isAppend: boolean = false) {
+
+
+
+export async function writeSQL(statement: string, saveFileAs = "", isAppend: boolean = false) {
   try {
     const destinationFile = process.argv[2] || saveFileAs;
     if (!destinationFile) {
@@ -18,15 +22,16 @@ async function writeSQL(statement: string, saveFileAs = "", isAppend: boolean = 
   }
 }
 
-async function readCSV(csvFileName = "", batchSize: number = 0) {
+export async function readCSV(csvFileName:string = "", batchSize: number = 0) {
   try {
-    const fileAndTableName = process.argv[2] || csvFileName;
+    const fileAndTableName = process.argv[2] || csvFileName||"ExampleTable";
     
     batchSize = parseInt(process.argv[3]) || batchSize || 500;
 		let isAppend: boolean = false;
 
     if (!fileAndTableName) {
       throw new Error("Missing csvFileName parameter");
+      
     }
     if(!existsSync(path.resolve(`./csv/${fileAndTableName}.csv`))){
       console.log("file not found")
@@ -35,12 +40,16 @@ async function readCSV(csvFileName = "", batchSize: number = 0) {
     const data = await fs.readFile(`csv/${fileAndTableName}.csv`, {
       encoding: "utf8",
     });
+
     const linesArray = data.split(/\r|\n/).filter((line) => line);
     const columnNames = linesArray?.shift()?.split(",") || [];
     let beginSQLInsert = `INSERT INTO ${fileAndTableName} (`;
+   
     columnNames.forEach((name) => (beginSQLInsert += `${name}, `));
+    
     beginSQLInsert = beginSQLInsert.slice(0, -2) + ")\nVALUES\n";
     let values = "";
+
     linesArray.forEach((line, index) => {
       // Parses each line of CSV into field values array
       const arr = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
@@ -67,6 +76,7 @@ async function readCSV(csvFileName = "", batchSize: number = 0) {
       let valueLine = "\t(";
       arr.forEach((value) => {
         // Matches NULL values, Numbers,
+
         // Strings accepted as numbers, and Booleans (0 or 1)
         if (value === "NULL" || !isNaN(+value)) {
           valueLine += `${value}, `;
@@ -83,6 +93,7 @@ async function readCSV(csvFileName = "", batchSize: number = 0) {
       valueLine = valueLine.slice(0, -2) + "),\n";
       values += valueLine;
     });
+
     values = values.slice(0, -2) + ";";
     const sqlStatement = beginSQLInsert + values;
     // Write File
@@ -91,5 +102,7 @@ async function readCSV(csvFileName = "", batchSize: number = 0) {
     console.log(err);
   }
 }
-readCSV();
+
+readCSV("ExampleTable",500);
+
 console.log("Finished!");
